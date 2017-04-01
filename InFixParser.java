@@ -79,7 +79,7 @@ public class InFixParser {
     
     private void isOperator(char chara, int priority){
         if(!stack.isEmpty() && stack.peek() != '('){
-            if(lastOrder > priority)
+            if(lastOrder >= priority)
                 output += stack.pop();
         }
         stack.push(chara);

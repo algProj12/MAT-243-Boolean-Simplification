@@ -10,9 +10,11 @@ package booleancalculator;
  */
 public class TruthTable {
     
+    boolean[] boolRow;
     private final int variables;
     boolean[][] boolTable;
     int intTable[][];
+    int counter;
     
     public TruthTable(int variables){
         this.variables = variables;
@@ -34,6 +36,35 @@ public class TruthTable {
                 }
             }
         }
+    }
+    
+    public void createBoolLine(int rowVal){
+        boolRow = new boolean [variables +1];
+        
+        if((rowVal <= (int)(Math.pow(2, variables))) && rowVal >= 1){
+            for(int i = 0; i < variables; i++){
+                int add = 0;
+
+                for(int k = 0; k < rowVal - 1; k++){
+                    if((k)%(int)(Math.pow(2, i)) == 0){
+                        add++;
+                    }
+                }
+
+                for(int j = rowVal - 1; j < rowVal; j++){
+                    if((j)%(int)(Math.pow(2, i)) == 0){
+                        add++;
+                    }
+                    if((add)%2 == 0){
+                        boolRow[i] = true;
+                        counter++;
+                    }
+                }
+            }
+        }
+        
+        else
+            System.out.println("the value outside the range");
     }
     
     public void printBoolTab(){

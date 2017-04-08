@@ -10,76 +10,81 @@ package booleancalculator;
  */
 public class BinaryTree {
     
-    private int maxVal;
-    private int minVal;
     private int permMax = 4;
     private int permMin = 0;
-    private int index = 0;
-    private int permIndex = 0;
     
-    treeNode root = new treeNode(4);
+    private treeNode root = new treeNode(2);
     
     public void addValue(int addVal){
         
-        maxVal = permMax;
-        minVal = permMin;
+        int maxVal = permMax;
+        int minVal = permMin;
         
-        if(addVal <= permMax && addVal >= permMin){
-            
-            treeNode current;
-            current = root;
-            
-            while(addVal != current.getKey()){
-                if(addVal < current.getKey()){
-                    if(current.getLeftBranch() != null){
-                        current = current.getLeftBranch();
-                        maxVal = minVal + ((minVal+maxVal)/2);
-                    }
-                    else{
-                        treeNode next = new treeNode();
-                        next.setKey(minVal + ((minVal+maxVal)/2));
-                        current.setLeftBranch(next);
-                        maxVal = minVal + ((minVal+maxVal)/2);
-                        current = next;
-                    }
-                }
-                 
-                else if(addVal > current.getKey()){
-                    if(current.getRightBranch() != null){
-                        current = current.getRightBranch();
-                        minVal = minVal + ((minVal+maxVal)/2);
-                    }
-                    else{
-                        treeNode next = new treeNode();
-                        next.setKey(minVal + ((minVal+maxVal)/2));
-                        current.setRightBranch(next);
-                        minVal = minVal + ((minVal+maxVal)/2);
-                        current = next;
-                    }
-                }
-                else
-                    return;
-                
-            }
-        }
-        
-        else if (addVal > permMax){
-            if(permIndex >= index){
-                permIndex++;
+        while(addVal > maxVal || addVal < minVal){
+            if(addVal > minVal){
                 treeNode temp = root;
                 permMin = permMax;
                 permMax *= 2;
-                root = new treeNode(permMax);
+
+                minVal = maxVal;
+                maxVal *= 2;
+
+                root = new treeNode(permMax/2);
+                root.setLeftBranch(temp);
             }
-            index++;
             
-            treeNode temp = root;
-            permMin = permMax;
-            permMax *= 2;
+            else{
+                maxVal = minVal;
+                minVal /= 2;
+            }
         }
-        else{
-            treeNode temp = root;
+        
+
+            
+        treeNode current;
+        current = root;
+        boolean first = true;
+
+
+        while(addVal != current.getKey()){
+            if(addVal < current.getKey()){
+                if(current.getLeftBranch() != null){
+                    current = current.getLeftBranch();
+                    maxVal = (minVal+maxVal)/2;
+                }
+                else{
+                    if(first != true){
+                        maxVal = (minVal+maxVal)/2;
+                    }
+                    treeNode next = new treeNode();
+                    next.setKey((minVal+maxVal)/2);
+                    current.setLeftBranch(next);
+                    current = next;
+                    first = false;
+                }
+            }
+
+            else if(addVal > current.getKey()){
+                if(current.getRightBranch() != null){
+                    current = current.getRightBranch();
+                    minVal = (minVal+maxVal)/2;
+                }
+                else{
+                    if(first != true)
+                        minVal = (minVal+maxVal)/2;
+                    
+                    treeNode next = new treeNode();
+                    next.setKey((minVal+maxVal)/2);
+                    current.setRightBranch(next);
+                    current = next;
+                    first = false;
+                }
+            }
+            else
+                return;
+
         }
+        
     }
     
     public void findValue(int searchVal){

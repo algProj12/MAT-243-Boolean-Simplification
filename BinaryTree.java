@@ -93,8 +93,18 @@ public class BinaryTree {
         
     }
     
-    public void findValue(int searchVal){
+    public treeNode findValue(int searchVal){
+        treeNode current = root;
         
+        while(current.getKey() != searchVal){
+            if(searchVal > current.getKey()){
+            current = current.getRightBranch();
+            }
+            else if(searchVal < current.getKey()){
+                current = current.getLeftBranch();
+            }
+        }
+        return current;
     }
     
     public void deleteVal(int searchVal){

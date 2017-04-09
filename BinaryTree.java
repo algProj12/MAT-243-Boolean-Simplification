@@ -13,7 +13,7 @@ public class BinaryTree {
     private int permMax = 4;
     private int permMin = 0;
     
-    private treeNode root = new treeNode(2);
+    private treeNode root = new treeNode(4);
     
     public void addValue(int addVal){
         
@@ -21,7 +21,7 @@ public class BinaryTree {
         int minVal = permMin;
         
         while(addVal > maxVal || addVal < minVal){
-            if(addVal > minVal){
+            if(addVal > maxVal && maxVal != 4){
                 treeNode temp = root;
                 permMin = permMax;
                 permMax *= 2;
@@ -33,10 +33,18 @@ public class BinaryTree {
                 root.setLeftBranch(temp);
             }
             
-            else{
+            else if(addVal < minVal){
                 maxVal = minVal;
                 minVal /= 2;
             }
+            else{
+                permMin = permMax;
+                permMax *= 2;
+
+                minVal = maxVal;
+                maxVal *= 2;
+            }
+                
         }
         
 
@@ -50,7 +58,6 @@ public class BinaryTree {
             if(addVal < current.getKey()){
                 if(current.getLeftBranch() != null){
                     current = current.getLeftBranch();
-                    maxVal = (minVal+maxVal)/2;
                 }
                 else{
                     if(first != true){
@@ -67,7 +74,6 @@ public class BinaryTree {
             else if(addVal > current.getKey()){
                 if(current.getRightBranch() != null){
                     current = current.getRightBranch();
-                    minVal = (minVal+maxVal)/2;
                 }
                 else{
                     if(first != true)

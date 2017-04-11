@@ -108,7 +108,17 @@ public class BinaryTree {
     }
     
     public void deleteVal(int searchVal){
+        treeNode current = root;
         
+        while(current.getKey() != searchVal){
+            if(searchVal > current.getKey()){
+                current = current.getRightBranch();
+            }
+            else if(searchVal < current.getKey()){
+                current = current.getLeftBranch();
+            }
+        }
+        current.setIntElement(0);
     }
     
     

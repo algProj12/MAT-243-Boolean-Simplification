@@ -38,7 +38,7 @@ public class BooleanCalculator {
         
         System.out.println(output);
         
-       int[] sizeOfGroup;
+           int[] sizeOfGroup;
         int[][][] allGroups;
         
         sizeOfGroup = new int[intVar + 1];
@@ -62,14 +62,14 @@ public class BooleanCalculator {
         boolean[] boolRow;
         int[] counter = new int[intVar + 1];
         BinaryTree[][] terms = new BinaryTree[intVar + 1][];
-        int[][] xVals = new int[intVar + 1][];
+        int[][][] xVals = new int[intVar + 1][][];
         int counter1 = 1;
         int count = 1;
         
         // generate array of terms
         for(int i = 0; i < sizeOfGroup.length; i++){
             terms[i] = new BinaryTree[sizeOfGroup[i]];
-            xVals[i] = new int[sizeOfGroup[i]];
+            xVals[i] = new int[sizeOfGroup[i]][intVar];
             
             for(int j = 0; j < terms[i].length; j++){
                 BinaryTree temp = new BinaryTree();
@@ -102,26 +102,85 @@ public class BooleanCalculator {
         }
         
         int j = 1;
-        int totalGroup = 0;
+        int tempSize;
         
-        for(int i = 0; i < sizeOfGroup.length; i++){
-            totalGroup += sizeOfGroup[i];
+        // create the list of combined factors
+        for(int o = 0; o < intVar; o++){
+            
+            counter1 = 0;
+            
+            for(int i = 0; i < allGroups.length-1; i++){
+
+                boolean xTrue = true;
+
+                // choose the groups
+                while(allGroups[i] == null || allGroups[j] == null){
+                    if(allGroups[i] == null){
+                        i++;
+                        j++;
+                    }
+                    else if(allGroups[j] == null){
+                        j++;
+                    }
+                }
+                
+                tempSize = allGroups[i].length*allGroups[j].length;
+
+                int[][] temp = new int[tempSize][];
+                BinaryTree[] termsTemp = new BinaryTree[tempSize];
+                int[][] xTemp = new int[tempSize][];
+
+                for(int k = 0; k < allGroups[i][k].length; k++){
+                    for(int l = 0; l < allGroups[j][l].length; l++){
+                        
+                        count = 1;
+                        
+                        for(int m = 0; m < xVals[i][l].length; m++){
+                            xTrue = xVals[i][k][m] == xVals[j][l][m];
+                        }
+
+                        if(xTrue && terms[j][l].findValue(1).getIntElement() > 
+                                terms[i][k].findValue(1).getIntElement() && 
+                                (terms[j][l].findValue(1).getIntElement() - 
+                                terms[i][k].findValue(1).getIntElement()) < 
+                                count){
+                            count *= 2;
+                        }
+                        // determine if it is equal
+                        else if(count == (terms[j][l].findValue(1).
+                                getIntElement() - terms[i][k]
+                                .findValue(1).getIntElement())){
+
+                            int diffVal = 0;
+
+                            while(allGroups[i][k][diffVal] == allGroups[j][l]
+                                    [diffVal]){
+
+                                diffVal++;
+                            }
+
+                            allGroups[i][k][diffVal] = 2;
+
+                            temp[counter1] = allGroups[i][k];
+
+                            for(int p = 0; p < terms[j][l].getCounter(); p++){
+                                terms[i][k].addValue(terms[j][l].findValue(p)
+                                        .getIntElement());
+                            } 
+                            
+                            xVals[i][k][counter1] = diffVal;
+                            xTemp[counter1] = xVals[i][k];
+                            
+                            counter1++;
+
+                        }
+                    }
+               }
+                allGroups[i] = temp;
+                terms[i] = termsTemp;
+                xVals[i] = xTemp;
+            }
         }
-        
-        
-        
-        for(int i = 0; i < allGroups.length-1; i++){
-            BinaryTree temp = new BinaryTree();
-            
-            
-            while(allGroups[i] == null || allGroups[j] == null){
-                if(allGroups[i] == null){
-                    i++;
-                    j++;
-                }
-                else if(allGroups[j] == null){
-                    j++;
-                }
                 
                 
                 

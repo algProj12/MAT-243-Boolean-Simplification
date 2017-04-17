@@ -1,558 +1,166 @@
-
 package booleancalculator;
 
-import java.io.*;
-import java.util.Stack;
+
 
 /**
  * Name: David Plotzke
- * Date: Mar 4, 2017
+ * Date: Apr 3, 2017
  * Assignment:
  * Description:
  */
-public class BooleanCalculator {
-
+public class BinaryTree<T> {
     
-    public static void main(String[] args) throws IOException {
-        BufferedReader stdin = new BufferedReader 
-                (new InputStreamReader(System.in));
-        InFixParser parser;
-        TruthTable refTable;
-        BinaryTree<BinaryTree<Integer>> testTree = new BinaryTree();
-        
-        String input,
-               output,
-               variables;  
-        int intVar;
-        
-        input = stdin.readLine();
-        parser = new InFixParser(input.replaceAll("\\s+", ""));
-        
-        output = parser.toPostFix();
-        
-        System.out.println("enter the number of variables");
-        variables = stdin.readLine();
-        
-        intVar = Integer.parseInt(variables);
-        refTable = new TruthTable(intVar);
-        
-        System.out.println(output);
-        double previousTime = System.nanoTime();
-        
-        for(int i = 0; i < 10000000; i++){
-            BinaryTree<Integer> blah = new BinaryTree();
-            Integer blaha = new Integer(i);
-            testTree.addNode(i);
-            testTree.setElement(i, blah);
-            testTree.getElement(i).addEleNode(i, blaha);
-            System.out.print(System.nanoTime()-previousTime);
-            System.out.println(testTree.getElement(i).getElement(i));
-            previousTime = System.nanoTime();
-        }
-        
-        /*
-    //--------------------------------------------------
-
-
-    BinaryTree<Integer[]>[] allGroups = new BinaryTree[intVar + 1];
-    BinaryTree<BinaryTree<Integer>>[] terms = new BinaryTree[intVar + 1];
-
-    refTable.countBoolTab();
-
-    //store binarytree objects in each of the groups
-    for(int i = 0; i < intVar + 1; i++){
-        BinaryTree<Integer[]> arrayTemp = new BinaryTree();
-        BinaryTree<BinaryTree<Integer>> temp = new BinaryTree();
-
-        allGroups[i] = arrayTemp;
-        terms[i] = temp;
+    private int permMax = 4;
+    private int permMin = 0;
+    private int counter = 0;
+    
+    public int getCounter() {
+        return counter;
     }
 
+    public void setCounter(int counter) {
+        this.counter = counter;
+    }
+    
+    private treeNode<T> root = new treeNode(4);
+    
+    public treeNode addNode(int addVal){
+        
+        counter++;
+        
+        int maxVal = permMax;
+        int minVal = permMin;
+        
+        while(addVal >= maxVal || addVal < minVal){
+            if(addVal >= maxVal && maxVal != 4){
+                treeNode temp = root;
+                permMin = permMax;
+                permMax *= 2;
 
-    //-----------------------------------------------------
+                minVal = maxVal;
+                maxVal *= 2;
 
-
-    int[] intRow;
-    Integer[] integerRow;
-    boolean[] boolRow;
-    int[] counter = new int[intVar + 1];
-
-
-
-    for(int i = 0; i < (int)Math.pow(2, intVar); i++){
-
-        boolRow = parseEquation(refTable.createBoolLine(i), intVar, output);
-
-        if(boolRow[intVar] == true){
-
-            intRow = refTable.createIntLine(i);
-
-            integerRow = new Integer[intRow.length];
-
-            for(int j = 0; j < intRow.length; j++){
-                integerRow[j] = intRow[j];
+                root = new treeNode(permMax/2);
+                root.setLeftBranch(temp);
             }
+            
+            else if(addVal < minVal){
+                maxVal = minVal;
+                minVal /= 2;
+            }
+            else{
+                permMin = permMax;
+                permMax *= 2;
 
-            // fill the tree with terms
-            terms[refTable.numberOfOnes[i]].addNode(counter[refTable.
-                    numberOfOnes[i]]+1);
+                minVal = maxVal;
+                maxVal *= 2;
+            }
+                
+        }
+            
+        treeNode current;
+        current = root;
+        boolean first = true;
 
-            BinaryTree temp = new BinaryTree();
 
-            terms[refTable.numberOfOnes[i]].setElement(counter[refTable.
-                    numberOfOnes[i]]+1, temp);
-
-            terms[refTable.numberOfOnes[i]].getElement(counter[refTable.
-                    numberOfOnes[i]]+1).addEleNode(terms[refTable.
-                            numberOfOnes[i]].getElement(counter[refTable.
-                            numberOfOnes[i]]+1).getCounter()+1, i);
-
+        while(addVal != current.getKey()){
+            if(addVal < current.getKey()){
+                if(current.getLeftBranch() != null){
                     
+                    if(first != true){
+                        maxVal = (minVal+maxVal)/2;
+                    }
+                    first = false;
+                    current = current.getLeftBranch();
+                }
+                else{
+                    if(first != true){
+                        maxVal = (minVal+maxVal)/2;
+                    }
+                    treeNode next = new treeNode();
+                    next.setKey((minVal+maxVal)/2);
+                    current.setLeftBranch(next);
+                    current = next;
+                    first = false;
+                }
+            }
 
-            allGroups[refTable.numberOfOnes[i]].addEleNode(counter[refTable.
-                    numberOfOnes[i]]+1, integerRow);
-
+            else if(addVal > current.getKey()){
+                if(current.getRightBranch() != null){
+                    if(first != true)
+                        minVal = (minVal+maxVal)/2;
+                    first = false;
+                    current = current.getRightBranch();
+                }
+                else{
+                    if(first != true)
+                        minVal = (minVal+maxVal)/2;
                     
-
-            counter[refTable.numberOfOnes[i]]++;
-        }
-    }
-
-
-
-    //---------------------------------------------------------
-
-    int groupCounter = 0; 
-    int count = 0;
-
-    for(int i = 0; i < intVar + 1; i++){
-        if(allGroups[i].getCounter() != 0){
-            groupCounter++;
-        }
-    }
-
-    BinaryTree<Integer[]>[] finalAllGroups = new BinaryTree[groupCounter];
-    BinaryTree<BinaryTree<Integer>>[] finalTerms = new BinaryTree[groupCounter];
-    BinaryTree<Integer[]>[] xVals = new BinaryTree[groupCounter];
-
-    for(int i = 0; i < groupCounter; i++){
-        BinaryTree<Integer[]> xTemp = new BinaryTree();
-        xVals[i] = xTemp;
-    }
-
-    for(int i = 0; i < intVar + 1; i++){
-        if(allGroups[i].getCounter() !=0){
-            finalAllGroups[count] = allGroups[i];
-            finalTerms[count] = terms[i];
-            count++;
-        }
-    }
-
-    allGroups = null;
-    terms = null;
-
-    //----------------------------------------------------------
-
-    int tempSize;
-    int iterations = finalAllGroups.length;
-    int counter1 = 0;
-    int x = 0;
-
-    // create the list of combined factors
-    for(int o = 0; o < iterations - 1; o++){
-        groupCounter--;
-
-        BinaryTree<Integer[]>[] nextAllGroups = new BinaryTree[groupCounter];
-        BinaryTree<BinaryTree<Integer>>[] nextTerms = new BinaryTree
-                [groupCounter];
-        BinaryTree<Integer[]>[] nextXVals = new BinaryTree[groupCounter];
-
-
-
-        for(int i = 0; i < finalAllGroups.length-1; i++){
-
-            counter1 = 0;
-
-            boolean xTrue = true;
-
-            // choose the groups
-
-            BinaryTree<Integer[]> arrayTemp = new BinaryTree();
-            BinaryTree<BinaryTree<Integer>> temp = new BinaryTree();
-            BinaryTree<Integer[]> xTemp = new BinaryTree();
-
-
-
-            for(int k = 1; k < finalAllGroups[i].getCounter()+1; k++){
-                for(int l = 1; l < finalAllGroups[i+1].getCounter()+1; l++){
-
-
-                    count = 1;
-
-                    for(int m = 0; m < o; m++){
-                        xTrue = xVals[i].getElement(k)[m].equals(xVals[i+1].
-                                getElement(l)[m]);
-                    }
-
-
-                    while(xTrue && finalTerms[i+1].getElement(l).getElement(1)> 
-                            finalTerms[i].getElement(k).getElement(1) && 
-                            (finalTerms[i+1].getElement(l).getElement(1) -
-                            finalTerms[i].getElement(k).getElement(1)) > 
-                            count){
-
-                        count *= 2;
-                    }
-
-
-                    // determine if it is equal
-                    if(count == finalTerms[i+1].getElement(l).
-                        getElement(1)-finalTerms[i].getElement(k).
-                        getElement(1)){
-
-                        
-
-                        int diffVal = 0;
-
-                        // determining what index of the term is different
-                        while(finalAllGroups[i].getElement(k)[diffVal].
-                                equals(finalAllGroups[i+1].getElement(l)
-                                [diffVal])){
-
-                            diffVal++;
-                        }
-
-                        // marking that location with a two
-                        finalAllGroups[i].getElement(k)[diffVal] = 2;
-
-                        // setting the new term to a temp residence
-                        arrayTemp.addEleNode(counter1+1, finalAllGroups[i].
-                                getElement(k));
-
-                        // merging the term values
-                        for(int p = finalTerms[i+1].getElement(l).
-                                getCounter(); p < (finalTerms[i+1].
-                                        getElement(l).getCounter())*2; p++){
-                            int count1 = 0;
-
-                            finalTerms[i].getElement(k).setElement(p+1, 
-                            finalTerms[i+1].getElement(l).getElement(count1+1));
-                        }
-
-                        temp.addEleNode(counter1+1, finalTerms[i].getElement(k));
-
-                        if(o == 0){
-                            Integer[] arrTemp = new Integer[intVar];
-                            xVals[i].addEleNode(counter1+1, arrTemp);
-                            xVals[i].getElement(counter1+1)[o] = diffVal;
-                            xTemp.addEleNode(counter1+1, xVals[i].getElement(counter1+1));
-                        }
-                        else{
-                            xVals[i].getElement(k)[o] = diffVal;
-
-                            xTemp.addEleNode(counter1+1, xVals[i].getElement(k));
-                        }
-
-                        counter1++;
-
-                    }
-                }
-           }
-
-            if(i == 1 && o == 2){
-                System.out.println("blah");
-            }
-
-            if(counter1 != 0){
-                nextAllGroups[i] = arrayTemp;
-                nextTerms[i] = temp;
-                nextXVals[i] = xTemp;
-                finalAllGroups[i] = null;
-                finalTerms[i] = null;
-                xVals[i] = null;
-
-            }
-
-        }
-        if(counter1 != 0){
-            finalAllGroups = nextAllGroups;
-            finalTerms = nextTerms;
-            xVals = nextXVals;
-        }
-    }
-        
-        */
-        
-        /*
-        
-        BinaryTree groups = new BinaryTree();
- 
-        
-        refTable.countBoolTab();
-        boolean[] boolRow;
-        int[] intRow;
-        int counter = 0;
-        int count = 0;
-        BinaryTree terms = new BinaryTree();
-        
-        
-        for(int i = 0; i < (int)(Math.pow(2, intVar)); i++){
-            
-            boolRow = parseEquation(refTable.createBoolLine(i), intVar, output);
-            
-            if(boolRow[intVar] == true){
-                
-                intRow = refTable.createIntLine(i);
-                
-                groups.
-            }
-            counter++;
-        }
-        
-        counter = 1;
-        
-        for(int i = 0; i < groups.length-1; i++){
-            
-            BinaryTree temp = new BinaryTree();
-            
-            for(int j = 1; j < groups.length; j++){
-                while(groups[i] == null || groups[j] == null){
-                    if(groups[i] == null){
-                        i++;
-                        j++;
-                    }
-                    else if(groups[j] == null){
-                        j++;
-                    }
-                }
-                
-                count += groups[i].getCounter();
-                
-                for(int k = 0; k < groups[i].getCounter(); k++){
-                    for(int l = 0; l < groups[l].getCounter(); l++){
-                        if(counter < terms[j].findValue(k).getIntElement()){
-                            counter *= 2;
-                        }
-                        else if(counter == groups[j].getCounter()){
-                            for(int m = 0; m < intVar - 1; m++){
-                                if(groups[i].findValue(k).getElement()[m] != 
-                                        groups[j].findValue(l).getElement()[m]){
-                                    boolean[] current = new boolean[intVar];
-                                    current = groups[i].findValue(k).getElement();
-                                    current[m] = null;
-                                }
-                            }
-                        }
-                    }
+                    treeNode next = new treeNode();
+                    next.setKey((minVal+maxVal)/2);
+                    current.setRightBranch(next);
+                    current = next;
+                    first = false;
                 }
             }
-        }
-        
-        
-        
-        
-        
-        
-        
-        double previousTime = 0;
-        for(int i = 1; i < 32768; i++){
-            refTable.createBoolLine(i);
-            System.out.println(System.nanoTime() - previousTime);
-            previousTime = System.nanoTime();
-        }
-        */
-        
-        /*
-        testTree.addNode(1);
-        testTree.addNode(9);
-        testTree.addNode(6);
-        */
-        
-        /*
-        double previousTime = 0;
-        for(int i = 0; i < 1000000; i++){
-            testTree.addNode(i);
-            System.out.println(testTree.findValue(i).getKey());
-            System.out.println(System.nanoTime() - previousTime);
-            previousTime = System.nanoTime();
-        }
-        */
-        
-        /*
-        final int constVal = 15;
-        int[] blah = new int[constVal];
-        int[] blaha = new int[constVal];
-        Random chocolate = new Random();
-        
-        
-        for(int j = 0; j < constVal; j++){
-           blah[j] = chocolate.nextInt(); 
-           blaha[j] = chocolate.nextInt();
-        }
-        
-        double beforeTime = System.nanoTime();
-        for(int i = 0; i < constVal; i++){
-            if(blah[i] != blaha[i]){
+            else{
+                return current;
             }
-        }
-        System.out.println(System.nanoTime()-beforeTime);
-        */
-        
-        
-        /*
-        refTable.createBoolLine(4);
-        
-        refTable.boolRow = parseEquation(refTable.boolRow, intVar, output);
-        
-        for(int i = 0; i < intVar+1; i++){
-            String printVal = Boolean.toString(refTable.boolRow[i]);
-            System.out.print(printVal);
-        }
-        */
-        
-        /*
-        if(output.charAt(0) == 'a'){
-            refTable.createBoolTab();
-            
-            refTable.createIntTab();
-            
-            refTable.boolTable = parseEquation(refTable.boolTable, intVar, output);
-            
-            refTable.convertToInt();
-            refTable.printIntTab();
-        }
-        
-        else{
-            System.out.println(parseEquation(output, intVar));
-        }
-        */
-        
-        
-    }
-    
-    /**
-     * Description: determines the answers to a boolean equation of postfix
-     * @param refTable
-     * @param intVar
-     * @param input
-     * @return 
-     */
-    
-    /*
-    
-    private static boolean[][] parseEquation(boolean[][] refTable, int intVar, 
-            String input){
-        
-        final Stack<Boolean> boolStack = new Stack<>();
-        
-        for(int i = 0; i < Math.pow(2, intVar); i++){
-            for(int j = 0; j < input.length(); j++){
-                char chara;
-                boolean first;
-                boolean second;
-                chara = input.charAt(j);
 
-                switch(chara){
-                    case '+':
-                        first = boolStack.pop();
-                        second = boolStack.pop();
-                        boolStack.push(first || second);
-                    break;
-                    case '*':
-                        first = boolStack.pop();
-                        second = boolStack.pop();
-                        boolStack.push(first && second);
-                    break;
-                    case '!':
-                        boolStack.push(!boolStack.pop());
-                    break;
-                    default:
-                        boolStack.push(refTable[i][(Character.
-                                getNumericValue(chara))-10]);
-                }
-            }
-            refTable[i][intVar] = boolStack.pop();
         }
-        return refTable;
+        return current;
     }
     
-    */
+    public void addEleNode(int addVal, T element){
+            addNode(addVal).setElement(element);
+        }
     
-    private static boolean[] parseEquation(boolean[] refTable, int intVar, 
-            String input){
+    public void addTreeNode(int addVal, T element){
         
-        final Stack<Boolean> boolStack = new Stack<>();
+    }
+    
+    public void setElement(int searchVal, T element){
+        treeNode current = root;
         
-        int counter = 0;
-        for(int j = 0; j < input.length(); j++){
-            char chara;
-            boolean first;
-            boolean second;
-            chara = input.charAt(j);
-
-            switch(chara){
-                case '+':
-                    first = boolStack.pop();
-                    second = boolStack.pop();
-                    boolStack.push(first || second);
-                break;
-                case '*':
-                    first = boolStack.pop();
-                    second = boolStack.pop();
-                    boolStack.push(first && second);
-                break;
-                case '!':
-                    boolStack.push(!boolStack.pop());
-                break;
-                default:
-                    boolStack.push(refTable[counter]);
-                    counter++;
+        while(current.getKey() != searchVal){
+            if(searchVal > current.getKey()){
+            current = current.getRightBranch();
+            }
+            else if(searchVal < current.getKey()){
+                current = current.getLeftBranch();
             }
         }
-        refTable[intVar] = boolStack.pop();
-        return refTable;
+        current.setElement(element);
+    }
+    
+    public T getElement(int searchVal){
+        treeNode current = root;
+        
+        while(current.getKey() != searchVal){
+            if(searchVal > current.getKey()){
+            current = current.getRightBranch();
+            }
+            else if(searchVal < current.getKey()){
+                current = current.getLeftBranch();
+            }
+        }
+        return (T)current.getElement();
+    }
+    
+    public void deleteVal(int searchVal){
+        treeNode current = root;
+        
+        while(current.getKey() != searchVal){
+            if(searchVal > current.getKey()){
+                current = current.getRightBranch();
+            }
+            else if(searchVal < current.getKey()){
+                current = current.getLeftBranch();
+            }
+        }
+        current.setElement(null);
     }
     
     
     
-    /**
-     * Description: determines the answer to a mathematical equation of postfix
-     * @param input
-     * @param intVar
-     * @return 
-     */
-    
-    public static double parseEquation(String input, int intVar){
-        
-        final Stack<Double> doubleStack = new Stack<>();
-        
-        for(int i = 0; i < Math.pow(2, intVar); i++){
-            for(int j = 0; j < input.length(); j++){
-                char chara;
-                chara = input.charAt(j);
-                double topStack;
-
-                switch(chara){
-                    case '+':
-                        doubleStack.push(doubleStack.pop() + doubleStack.pop());
-                    break;
-                    case '*':
-                        doubleStack.push(doubleStack.pop()*doubleStack.pop());
-                    break;
-                    case '-':
-                        topStack = doubleStack.pop();
-                        doubleStack.push(doubleStack.pop()-topStack);
-                    break;
-                    case '/':
-                        topStack = doubleStack.pop();
-                        
-                        doubleStack.push(doubleStack.pop()/topStack);
-                    break;
-                    default:
-                        doubleStack.push(Double.parseDouble(Character.toString(chara)));
-                }
-            }
-        }
-        return doubleStack.pop();
-    }
 }

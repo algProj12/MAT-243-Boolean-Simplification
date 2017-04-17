@@ -8,12 +8,12 @@ package booleancalculator;
  * Assignment:
  * Description:
  */
-public class treeNode {
+public class treeNode<T> {
     private int key;
-    private int intElement;
     private treeNode leftBranch;
     private treeNode rightBranch;
-
+    private T element;
+    
     public treeNode(){
         
     }
@@ -26,24 +26,8 @@ public class treeNode {
         return key;
     }
 
-    public int getIntElement() {
-        return intElement;
-    }
-
-    public treeNode getLeftBranch() {
-        return leftBranch;
-    }
-
-    public treeNode getRightBranch() {
-        return rightBranch;
-    }
-
     public void setKey(int key) {
         this.key = key;
-    }
-
-    public void setIntElement(int intElement) {
-        this.intElement = intElement;
     }
 
     public void setLeftBranch(treeNode leftBranch) {
@@ -54,5 +38,25 @@ public class treeNode {
         this.rightBranch = rightBranch;
     }
 
+    public void setElement(T element) {
+        this.element = element;
+    }
+
+    public treeNode getLeftBranch() {
+        return leftBranch;
+    }
+
+    public treeNode getRightBranch() {
+        return rightBranch;
+    }
+
+    public T getElement() {
+        return element;
+    }
     
+    
+
+    
+}
+
 }

@@ -37,20 +37,20 @@ public class BooleanCalculator {
         refTable = new TruthTable(intVar);
         
         System.out.println(output);
-        double previousTime = System.nanoTime();
+//        double previousTime = System.nanoTime();
         
-        for(int i = 0; i < 10000000; i++){
+        
+        /*
+        for(int i = 0; i < 1000000; i++){
             BinaryTree<Integer> blah = new BinaryTree();
             Integer blaha = new Integer(i);
             testTree.addNode(i);
             testTree.setElement(i, blah);
             testTree.getElement(i).addEleNode(i, blaha);
-            System.out.print(System.nanoTime()-previousTime);
-            System.out.println(testTree.getElement(i).getElement(i));
-            previousTime = System.nanoTime();
         }
+        */
         
-        /*
+//        /*
     //--------------------------------------------------
 
 
@@ -105,8 +105,7 @@ public class BooleanCalculator {
             terms[refTable.numberOfOnes[i]].getElement(counter[refTable.
                     numberOfOnes[i]]+1).addEleNode(terms[refTable.
                             numberOfOnes[i]].getElement(counter[refTable.
-                            numberOfOnes[i]]+1).getCounter()+1, i);
-
+                            numberOfOnes[i]]+1).getCounter()+1, i+1);
                     
 
             allGroups[refTable.numberOfOnes[i]].addEleNode(counter[refTable.
@@ -115,7 +114,11 @@ public class BooleanCalculator {
                     
 
             counter[refTable.numberOfOnes[i]]++;
+            
         }
+        if(i == (int)Math.pow(2, intVar)-1 ){
+                System.out.println("blah");
+            }
     }
 
 
@@ -156,7 +159,6 @@ public class BooleanCalculator {
     int tempSize;
     int iterations = finalAllGroups.length;
     int counter1 = 0;
-    int x = 0;
 
     // create the list of combined factors
     for(int o = 0; o < iterations - 1; o++){
@@ -173,7 +175,6 @@ public class BooleanCalculator {
 
             counter1 = 0;
 
-            boolean xTrue = true;
 
             // choose the groups
 
@@ -185,17 +186,21 @@ public class BooleanCalculator {
 
             for(int k = 1; k < finalAllGroups[i].getCounter()+1; k++){
                 for(int l = 1; l < finalAllGroups[i+1].getCounter()+1; l++){
-
-
+                    
+                    int count1 = 1;
                     count = 1;
-
-                    for(int m = 0; m < o; m++){
+                    boolean sameVal = false;
+                    boolean xTrue = true;
+                    
+                    // edited for exit should xTrue equal false before the end
+                    // of the string
+                    for(int m = 0; m < o && xTrue == true; m++){
                         xTrue = xVals[i].getElement(k)[m].equals(xVals[i+1].
                                 getElement(l)[m]);
                     }
 
 
-                    while(xTrue && finalTerms[i+1].getElement(l).getElement(1)> 
+                    while(finalTerms[i+1].getElement(l).getElement(1)> 
                             finalTerms[i].getElement(k).getElement(1) && 
                             (finalTerms[i+1].getElement(l).getElement(1) -
                             finalTerms[i].getElement(k).getElement(1)) > 
@@ -206,12 +211,10 @@ public class BooleanCalculator {
 
 
                     // determine if it is equal
-                    if(count == finalTerms[i+1].getElement(l).
+                    if(xTrue && count == finalTerms[i+1].getElement(l).
                         getElement(1)-finalTerms[i].getElement(k).
                         getElement(1)){
-
                         
-
                         int diffVal = 0;
 
                         // determining what index of the term is different
@@ -221,48 +224,84 @@ public class BooleanCalculator {
 
                             diffVal++;
                         }
-
-                        // marking that location with a two
-                        finalAllGroups[i].getElement(k)[diffVal] = 2;
-
-                        // setting the new term to a temp residence
-                        arrayTemp.addEleNode(counter1+1, finalAllGroups[i].
-                                getElement(k));
-
-                        // merging the term values
-                        for(int p = finalTerms[i+1].getElement(l).
-                                getCounter(); p < (finalTerms[i+1].
-                                        getElement(l).getCounter())*2; p++){
-                            int count1 = 0;
-
-                            finalTerms[i].getElement(k).setElement(p+1, 
-                            finalTerms[i+1].getElement(l).getElement(count1+1));
+                        
+                        Integer[] temp2 = new Integer[finalAllGroups[i].
+                                getElement(k).length];
+                        
+                        arrayTemp.addEleNode(counter1+1, temp2);
+                        
+                        for(int r = 0; r < finalAllGroups[i].getElement(k).
+                                length; r++){
+                            arrayTemp.getElement(counter1+1)[r] = finalAllGroups
+                            [i].getElement(k)[r]; 
                         }
-
-                        temp.addEleNode(counter1+1, finalTerms[i].getElement(k));
-
-                        if(o == 0){
-                            Integer[] arrTemp = new Integer[intVar];
-                            xVals[i].addEleNode(counter1+1, arrTemp);
-                            xVals[i].getElement(counter1+1)[o] = diffVal;
-                            xTemp.addEleNode(counter1+1, xVals[i].getElement(counter1+1));
+                        
+                        arrayTemp.getElement(counter1+1)[diffVal] = 2;
+                        
+                        if(o > 0){
+                            for(int r = 1; r < arrayTemp.getCounter() && sameVal
+                                    == false; r++){
+                                
+                                
+                                sameVal = true;
+                                for(int s = 0; s < arrayTemp.getElement(r).length 
+                                        && sameVal == true; s++){
+                                    sameVal = arrayTemp.getElement(arrayTemp.
+                                            getCounter())[s].equals
+                                            (arrayTemp.getElement(r)[s]); 
+                                }
+                            }
                         }
-                        else{
-                            xVals[i].getElement(k)[o] = diffVal;
+                        
+                        if(sameVal == false){
+                            // setting the new term to a temp residence
 
-                            xTemp.addEleNode(counter1+1, xVals[i].getElement(k));
+                            BinaryTree<Integer> temp1 = new BinaryTree();
+
+                            temp.addEleNode(counter1+1, temp1);
+
+
+                            // merging the term values
+                            for(int r = 1; r < finalTerms[i].getElement(k).getCounter()+1; r++){
+
+                                temp.getElement(counter1+1).addEleNode(count1, 
+                                finalTerms[i].getElement(k).getElement(r));
+                                count1++;
+                            }
+
+                            for(int r = 1; r < finalTerms[i+1].getElement(l).getCounter()+1; r++){
+                                temp.getElement(counter1+1).addEleNode(count1, 
+                                finalTerms[i+1].getElement(l).getElement(r));
+                                count1++;
+                            }
+
+                            if(o == 0){
+                                Integer[] arrTemp = new Integer[intVar];
+                                xVals[i].addEleNode(counter1+1, arrTemp);
+                                xVals[i].getElement(counter1+1)[o] = diffVal;
+                                xTemp.addEleNode(counter1+1, xVals[i].getElement(counter1+1));
+                            }
+                            else{
+                                xVals[i].getElement(k)[o] = diffVal;
+
+                                xTemp.addEleNode(counter1+1, xVals[i].getElement(k));
+                            }
+
+                            counter1++;
                         }
-
-                        counter1++;
-
+                        else
+                            arrayTemp.deleteVal(counter1+1);
                     }
                 }
            }
 
-            if(i == 1 && o == 2){
+            if(i == 0 && o == 1){
                 System.out.println("blah");
             }
-
+            
+            if(i == 1 && o == 0){
+                System.out.println("blah");
+            }
             if(counter1 != 0){
                 nextAllGroups[i] = arrayTemp;
                 nextTerms[i] = temp;
@@ -281,7 +320,7 @@ public class BooleanCalculator {
         }
     }
         
-        */
+//        */
         
         /*
         

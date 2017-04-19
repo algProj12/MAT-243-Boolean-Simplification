@@ -159,6 +159,7 @@ public class BinaryTree<T> {
             }
         }
         current.setElement(null);
+        count--;
     }
     
     
